@@ -19,8 +19,12 @@
       <div class="card-body">
         <h5 class="card-title">Edit</h5>
         <form method="POST" action= <%=`/urls/${ shortURL }/edit`%> >
-          <p class="card-text">New URL:</p><input class="form-control" type="text" name="newURL" placeholder= <%= `${longURL}` %> style="width: 300px; margin: 1em">
-          <button type="submit" class="btn btn-primary">Update</button>
+          <div cleass="input-group">
+            <label>New URL:
+              <input type="text" name="newURL" placeholder= <%= `${longURL}` %> style="width: 300px; margin: 1em">
+            </label>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
         </form>
       </div>
     <div class="card-footer text-muted"></div>
