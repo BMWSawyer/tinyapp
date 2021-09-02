@@ -6,10 +6,15 @@ const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+const users = {
+
 };
 
 app.get("/", (req, res) => {
@@ -57,6 +62,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:shortURL/edit", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.newURL;
+
+  res.redirect("/urls");
+});
+
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body.username);
 
   res.redirect("/urls");
 });
