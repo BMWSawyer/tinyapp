@@ -13,8 +13,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = {
-
+const usersDatabase = {
+  "me@me.com": {
+    "name": "Me",
+    "email": "me@me.com",
+    "password": "1234"
+  },
+  
+  "you@you.com": {
+    "name": "You",
+    "email": "you@you.com",
+    "password": "12345"
+  }
 };
 
 app.get("/", (req, res) => {
@@ -27,6 +37,15 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+app.get("/register", (req, res) => {
+  const templateVars = { 
+    users: usersDatabase,
+    username: req.cookies["username"] 
+  };
+
+  res.render("urls_register", templateVars);
 });
 
 app.get("/urls", (req, res) => {
@@ -57,6 +76,22 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
 
   res.redirect(longURL);
+});
+
+
+app.post("/register", (req, res) => {
+  const templateVars = { 
+    username: req.cookies["username"]
+  };
+  const { name, email, password } = req.body;
+
+  const user = usersDatabase[email];
+
+  if (!user) {
+    res.render("/urls", templateVars);
+  } else {
+  
+  }
 });
 
 app.post("/urls", (req, res) => {
