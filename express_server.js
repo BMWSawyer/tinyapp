@@ -89,20 +89,24 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 app.post("/register", (req, res) => {
-
   const { email, password } = req.body;
 
-  const newUserID = generateRandomString();
+  if (email.length !== 0 && password.length !== 0 && checkEmail(email)) {
+    const newUserID = generateRandomString();
   
-  users[`${newUserID}`] = {
-    "id": newUserID,
-    "email": email,
-    "password": password
+    users[`${newUserID}`] = {
+      "id": newUserID,
+      "email": email,
+      "password": password
+    }
+     
+    res.cookie("user_id", newUserID);
+  
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(400);
+    console.log(res.statusCode)
   }
-   
-  res.cookie("user_id", newUserID);
-
-  res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
@@ -168,4 +172,13 @@ function generateRandomString() {
   let shortURL = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
 
   return shortURL;
+}
+
+function checkEmail(email) {
+  for (const user in users) {
+    if (users[user].email !== email) {
+      return true;
+    }
+    return false;
+  }
 }
