@@ -154,12 +154,13 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 app.post("/login", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  const { email, password } = req.body;
 
   const templateVars = { 
     user: user
   };
   
-  res.cookie("email", req.body.email);
+  res.cookie("user_id", req.cookies["user_id"]);
   res.redirect("/urls", templateVars);
 });
 
@@ -170,7 +171,7 @@ app.post("/logout", (req, res) => {
     user: user
   };
   
-  res.clearCookie("email");
+  res.clearCookie("user_id");
   res.redirect("/urls", templateVars);
 });
 
