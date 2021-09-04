@@ -85,11 +85,15 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]];
   
-  const templateVars = { 
-    user: user
-  };
-
-  res.render("urls_new", templateVars);
+  if (!user) {
+    res.redirect("/login");
+  } else {
+    const templateVars = { 
+      user: user
+    };
+  
+    res.render("urls_new", templateVars);
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
