@@ -74,7 +74,6 @@ app.get("/login", (req, res) => {
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const id = user.id;
-  console.log(id);
 
   const urls = urlsForUser(id);
 
@@ -82,13 +81,6 @@ app.get("/urls", (req, res) => {
     user: user,
     urls: urls
   };
-  //templateVars["shortURL"] = "";
-  //templateVars["urls"] = {};
-  
- 
-  //console.log(shortURL)
-  //console.log(urlDatabase[shortURL])
-
 
   res.render("urls_index", templateVars);
 });
@@ -163,25 +155,37 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
   const user = users[req.cookies["user_id"]];
+  const id = user.id;
 
-  const templateVars = { 
-    user: user
-  };
+  // const templateVars = { 
+  //   user: user
+  // };
 
-  res.redirect("/urls");
+  console.log(verifyUser(id));
+
+  if(verifyUser(id)) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.newURL;
   const user = users[req.cookies["user_id"]];
+  const id = user.id;
 
-  const templateVars = { 
-    user: user
-  };
+  // const templateVars = { 
+  //   user: user
+  // };
 
-  res.redirect("/urls");
+  if(verifyUser(id)) {
+    urlDatabase[req.params.shortURL].longURL = req.body.newURL;
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -236,9 +240,6 @@ function urlsForUser(id) {
   const userURLsObj = {};
   
   for (const shortURL in urlDatabase) {
-    
-    console.log(shortURL)
-    console.log(urlDatabase[shortURL])
 
     if (id === urlDatabase[shortURL].userID) {
       userURLsObj[shortURL] = {
@@ -251,4 +252,14 @@ function urlsForUser(id) {
     }
   }
   return null; 
+}
+
+function verifyUser(id) { 
+
+  for (const shortURL in urlDatabase) {
+    if (id === urlDatabase[shortURL].userID) {
+      return true;
+    }
+  }
+  return false; 
 }
