@@ -17,13 +17,25 @@ const users = {
   "userRandomID": {
     "id": "userRandomID",
     "email": "me@me.com",
-    "password": "1234"
+    "password": "123"
   },
   
   "user2RandomID": {
     "id": "user2RandomID",
     "email": "you@you.com",
+    "password": "1234"
+  },
+
+  "user3RandomID": {
+    "id": "user3RandomID",
+    "email": "hola@hola.com",
     "password": "12345"
+  },
+
+  "user4RandomID": {
+    "id": "user4RandomID",
+    "email": "yeh@yeh.com",
+    "password": "123456"
   }
 };
 
@@ -76,6 +88,7 @@ app.get("/urls/new", (req, res) => {
   const templateVars = { 
     user: user
   };
+
   res.render("urls_new", templateVars);
 });
 
@@ -127,7 +140,7 @@ app.post("/urls", (req, res) => {
   const templateVars = { 
     user: user
   };
-  res.redirect(`/urls/${shortURL}`, templateVars);         
+  res.redirect(`/urls/${shortURL}`);         
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -138,7 +151,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     user: user
   };
 
-  res.redirect("/urls", templateVars);
+  res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
@@ -149,30 +162,30 @@ app.post("/urls/:shortURL/edit", (req, res) => {
     user: user
   };
 
-  res.redirect("/urls", templateVars);
+  res.redirect("/urls");
 });
 
 app.post("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]];
   const { email, password } = req.body;
+  console.log(email)
+  console.log(password)
+  //console.log(users)
 
-  const templateVars = { 
-    user: user
-  };
-  
-  res.cookie("user_id", req.cookies["user_id"]);
-  res.redirect("/urls", templateVars);
+  const validUser = authenticaeUser(email, password);
+
+  if(validUser) {
+    res.cookie("user_id", users[validUser].id);
+    res.redirect("/urls");
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.post("/logout", (req, res) => {
-  const user = users[req.cookies["user_id"]];
-
-  const templateVars = { 
-    user: user
-  };
+  //const user = users[req.cookies["user_id"]];
   
   res.clearCookie("user_id");
-  res.redirect("/urls", templateVars);
+  res.redirect("/login");
 });
 
 app.listen(PORT, () => {
@@ -192,4 +205,13 @@ function checkEmail(email) {
     }
     return false;
   }
+}
+
+function authenticaeUser(email, password) {
+  for (const user in users) {
+    if (users[user].email === email && users[user].password === password) {
+      return user;
+    }
+  }
+  return null;
 }
