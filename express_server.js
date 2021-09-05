@@ -1,3 +1,11 @@
+// 1.   Project Name: TinyApp
+// 2.   File Name: express_server.js
+// 3.   Written By: Brad Sawyer
+// 4.   Date Started: 30th August, 2021
+// 5.   Purpose: This project will create a full stack web application that will shorten
+//                URLs. This is the main server file for the entire project.
+
+
 // Requiring dependencies
 const express = require("express");
 const app = express();
