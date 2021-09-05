@@ -20,34 +20,13 @@ app.use(cookieSession({
   keys: ['my-secret-key']
 }));
 
-const urlDatabase = {
-  "b2xVn2": { "longURL":"http://www.lighthouselabs.ca" },
-  "9sm5xK": { "longURL": "http://www.google.com" }
-};
+const urlDatabase = { };
 
 const users = {
   "userRandomID": {
     "id": "userRandomID",
     "email": "me@me.com",
     "password": "123"
-  },
-  
-  "user2RandomID": {
-    "id": "user2RandomID",
-    "email": "you@you.com",
-    "password": "1234"
-  },
-
-  "user3RandomID": {
-    "id": "user3RandomID",
-    "email": "hola@hola.com",
-    "password": "12345"
-  },
-
-  "user4RandomID": {
-    "id": "user4RandomID",
-    "email": "yeh@yeh.com",
-    "password": "123456"
   }
 };
 
@@ -125,7 +104,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
-
+  
   res.redirect(longURL);
 });
 
@@ -159,12 +138,7 @@ app.post("/urls", (req, res) => {
     "userID": req.session["user_id"]
   };
 
-  //const user = users[req.session["user_id"]];
-
-  // const templateVars = { 
-  //   user: user
-  // };
-
+  console.log(urlDatabase)
   res.redirect(`/urls/${shortURL}`);         
 });
 
@@ -213,60 +187,3 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-// function generateRandomString() {
-//   let shortURL = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
-
-//   return shortURL;
-// }
-
-// function checkEmail(email) {
-//   for (const user in users) {
-//     if (users[user].email !== email) {
-//       return true;
-//     }
-//     return false;
-//   }
-// }
-
-// function authenticaeUser(email, password) {
-//   for (const user in users) {
-//     if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
-//       return user;
-//     }
-//   }
-//   return null;
-// }
-
-// function urlsForUser(id) {
-//   const userURLsObj = {};
-  
-//   for (const shortURL in urlDatabase) {
-
-//     if (id === urlDatabase[shortURL].userID) {
-//       userURLsObj[shortURL] = {
-//         "shortURL": shortURL,
-//         "longURL": urlDatabase[shortURL].longURL,
-//         "userID": urlDatabase[shortURL].userID
-//       };
-
-//       return userURLsObj;
-//     }
-//   }
-//   return null; 
-// }
-
-// function verifyUser(id) { 
-
-//   for (const shortURL in urlDatabase) {
-//     if (id === urlDatabase[shortURL].userID) {
-//       return true;
-//     }
-//   }
-//   return false; 
-// }
-
-// const getUserByEmail = function(email, database) {
-//   // lookup magic...
-//   return user;
-// };
