@@ -8,8 +8,7 @@ const {
   checkEmail,
   authenticaeUser,
   urlsForUser,
-  verifyUser,
-  getUserByEmail
+  verifyUser
 } = require("./helpers");
 
 const PORT = 8080; // default port 8080
