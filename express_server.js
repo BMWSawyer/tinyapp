@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcrypt');
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -123,11 +124,12 @@ app.post("/register", (req, res) => {
 
   if (email.length !== 0 && password.length !== 0 && checkEmail(email)) {
     const newUserID = generateRandomString();
-  
+    const securePassword = bcrypt.hashSync(password, 10);
+    
     users[`${newUserID}`] = {
       "id": newUserID,
       "email": email,
-      "password": password
+      "password": securePassword
     }
      
     res.cookie("user_id", newUserID);
@@ -190,7 +192,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-
+  
   const validUser = authenticaeUser(email, password);
 
   if(validUser) {
@@ -229,7 +231,7 @@ function checkEmail(email) {
 
 function authenticaeUser(email, password) {
   for (const user in users) {
-    if (users[user].email === email && users[user].password === password) {
+    if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
       return user;
     }
   }
@@ -263,3 +265,7 @@ function verifyUser(id) {
   }
   return false; 
 }
+
+// const password = "purple-monkey-dinosaur";
+// const hashedPassword = bcrypt.hashSync(password, 10);
+// console.log(hashedPassword)
