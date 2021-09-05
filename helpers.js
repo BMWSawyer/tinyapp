@@ -52,9 +52,14 @@ const verifyUser = function(id, urlDatabase) {
   return false; 
 }
 
-const getUserByEmail = function(email, users) {
-  // lookup magic...
-  return user;
+//This function is not used in the main project and is only here for the mocha and chai testing assignment
+const getUserByEmail = function(email, usersDatabase) {
+  for (const user in usersDatabase) {
+    if(usersDatabase[user].email === email){
+      return usersDatabase[user].id;
+    }
+  }
+  return undefined;
 };
 
 module.exports = {
