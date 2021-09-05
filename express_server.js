@@ -3,6 +3,15 @@ const app = express();
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcrypt');
+const {
+  generateRandomString,
+  checkEmail,
+  authenticaeUser,
+  urlsForUser,
+  verifyUser,
+  getUserByEmail
+} = require("./helpers");
+
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
@@ -79,7 +88,7 @@ app.get("/urls", (req, res) => {
   const user = users[req.session["user_id"]];
   const id = user.id;
 
-  const urls = urlsForUser(id);
+  const urls = urlsForUser(id, urlDatabase);
 
   const templateVars = { 
     user: user,
@@ -125,7 +134,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
-  if (email.length !== 0 && password.length !== 0 && checkEmail(email)) {
+  if (email.length !== 0 && password.length !== 0 && checkEmail(email, users)) {
     const newUserID = generateRandomString();
     const securePassword = bcrypt.hashSync(password, 10);
     
@@ -151,11 +160,12 @@ app.post("/urls", (req, res) => {
     "userID": req.session["user_id"]
   };
 
-  const user = users[req.session["user_id"]];
+  //const user = users[req.session["user_id"]];
 
-  const templateVars = { 
-    user: user
-  };
+  // const templateVars = { 
+  //   user: user
+  // };
+
   res.redirect(`/urls/${shortURL}`);         
 });
 
@@ -163,7 +173,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.session["user_id"]];
   const id = user.id;
 
-  if(verifyUser(id)) {
+  if(verifyUser(id, urlDatabase)) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   } else {
@@ -175,7 +185,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const user = users[req.session["user_id"]];
   const id = user.id;
 
-  if(verifyUser(id)) {
+  if(verifyUser(id, urlDatabase)) {
     urlDatabase[req.params.shortURL].longURL = req.body.newURL;
     res.redirect("/urls");
   } else {
@@ -186,7 +196,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   
-  const validUser = authenticaeUser(email, password);
+  const validUser = authenticaeUser(email, password, users);
 
   if(validUser) {
     req.session["user_id"] = users[validUser].id;
@@ -205,54 +215,59 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-function generateRandomString() {
-  let shortURL = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
+// function generateRandomString() {
+//   let shortURL = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
 
-  return shortURL;
-}
+//   return shortURL;
+// }
 
-function checkEmail(email) {
-  for (const user in users) {
-    if (users[user].email !== email) {
-      return true;
-    }
-    return false;
-  }
-}
+// function checkEmail(email) {
+//   for (const user in users) {
+//     if (users[user].email !== email) {
+//       return true;
+//     }
+//     return false;
+//   }
+// }
 
-function authenticaeUser(email, password) {
-  for (const user in users) {
-    if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
-      return user;
-    }
-  }
-  return null;
-}
+// function authenticaeUser(email, password) {
+//   for (const user in users) {
+//     if (users[user].email === email && bcrypt.compareSync(password, users[user].password)) {
+//       return user;
+//     }
+//   }
+//   return null;
+// }
 
-function urlsForUser(id) {
-  const userURLsObj = {};
+// function urlsForUser(id) {
+//   const userURLsObj = {};
   
-  for (const shortURL in urlDatabase) {
+//   for (const shortURL in urlDatabase) {
 
-    if (id === urlDatabase[shortURL].userID) {
-      userURLsObj[shortURL] = {
-        "shortURL": shortURL,
-        "longURL": urlDatabase[shortURL].longURL,
-        "userID": urlDatabase[shortURL].userID
-      };
+//     if (id === urlDatabase[shortURL].userID) {
+//       userURLsObj[shortURL] = {
+//         "shortURL": shortURL,
+//         "longURL": urlDatabase[shortURL].longURL,
+//         "userID": urlDatabase[shortURL].userID
+//       };
 
-      return userURLsObj;
-    }
-  }
-  return null; 
-}
+//       return userURLsObj;
+//     }
+//   }
+//   return null; 
+// }
 
-function verifyUser(id) { 
+// function verifyUser(id) { 
 
-  for (const shortURL in urlDatabase) {
-    if (id === urlDatabase[shortURL].userID) {
-      return true;
-    }
-  }
-  return false; 
-}
+//   for (const shortURL in urlDatabase) {
+//     if (id === urlDatabase[shortURL].userID) {
+//       return true;
+//     }
+//   }
+//   return false; 
+// }
+
+// const getUserByEmail = function(email, database) {
+//   // lookup magic...
+//   return user;
+// };
