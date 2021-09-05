@@ -6,16 +6,22 @@ const generateRandomString = function() {
   let shortURL = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
 
   return shortURL;
-}
+};
 
 const checkEmail = function(email, users) {
+  let result = true;
+  
   for (const user in users) {
-    if (users[user].email !== email || users === undefined) {
-      return true;
+    if (users[user].email !== email || users === {}) {
+      return result;
     }
-    return false;
+
+    result = false;
+    return result;
   }
-}
+  
+  return result;
+};
 
 const authenticaeUser = function(email, password, users) {
   for (const user in users) {
@@ -24,7 +30,7 @@ const authenticaeUser = function(email, password, users) {
     }
   }
   return null;
-}
+};
 
 const urlsForUser = function(id, urlDatabase) {
   const userURLsObj = {};
@@ -37,30 +43,35 @@ const urlsForUser = function(id, urlDatabase) {
         "longURL": urlDatabase[shortURL].longURL,
         "userID": urlDatabase[shortURL].userID
       };
+    
     } else {
       return null;
     }
   }
-  return userURLsObj; 
-}
+  
+  return userURLsObj;
+};
 
-const verifyUser = function(id, urlDatabase) { 
-
+const verifyUser = function(id, urlDatabase) {
   for (const shortURL in urlDatabase) {
+    
     if (id === urlDatabase[shortURL].userID) {
       return true;
     }
   }
-  return false; 
-}
+  
+  return false;
+};
 
 // This function is not used in the main project and is only here for the mocha and chai testing assignment
 const getUserByEmail = function(email, usersDatabase) {
   for (const user in usersDatabase) {
-    if(usersDatabase[user].email === email){
+    
+    if (usersDatabase[user].email === email) {
       return usersDatabase[user].id;
     }
   }
+  
   return undefined;
 };
 
