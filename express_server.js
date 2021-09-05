@@ -1,3 +1,4 @@
+// Requiring dependencies
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -11,8 +12,10 @@ const {
   verifyUser
 } = require("./helpers");
 
+// Setting the PORT
 const PORT = 8080; // default port 8080
 
+// Setting the view engine and the use of body-parser and cookie-session
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -20,32 +23,26 @@ app.use(cookieSession({
   keys: ['my-secret-key']
 }));
 
+// Creating the empty url and users databases
 const urlDatabase = { };
+const users = { };
 
-const users = {
-  "userRandomID": {
-    "id": "userRandomID",
-    "email": "me@me.com",
-    "password": "123"
-  }
-};
 
+// GET routes
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  const user = users[req.session["user_id"]];
+  
+  const templateVars = {
+    user: user
+  };
+  
+  res.render("urls_register", templateVars);
 });
 
 app.get("/register", (req, res) => {
   const user = users[req.session["user_id"]];
   
-  const templateVars = { 
+  const templateVars = {
     user: user
   };
 
@@ -55,7 +52,7 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const user = users[req.session["user_id"]];
   
-  const templateVars = { 
+  const templateVars = {
     user: user
   };
 
@@ -68,7 +65,7 @@ app.get("/urls", (req, res) => {
 
   const urls = urlsForUser(id, urlDatabase);
 
-  const templateVars = { 
+  const templateVars = {
     user: user,
     urls: urls
   };
@@ -81,8 +78,9 @@ app.get("/urls/new", (req, res) => {
   
   if (!user) {
     res.redirect("/login");
+  
   } else {
-    const templateVars = { 
+    const templateVars = {
       user: user
     };
   
@@ -93,8 +91,8 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
 
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
+  const templateVars = {
+    shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
     user: user
   };
@@ -108,7 +106,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-
+// POST routes
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
@@ -120,35 +118,36 @@ app.post("/register", (req, res) => {
       "id": newUserID,
       "email": email,
       "password": securePassword
-    }
+    };
      
     req.session["user_id"] = newUserID;
-  
     res.redirect("/urls");
+  
   } else {
     res.sendStatus(400);
-    console.log(res.statusCode)
+    console.log(res.statusCode);
   }
 });
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
+ 
   urlDatabase[shortURL] = {
     "longURL": req.body.longURL,
     "userID": req.session["user_id"]
   };
 
-  console.log(urlDatabase)
-  res.redirect(`/urls/${shortURL}`);         
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.session["user_id"]];
   const id = user.id;
 
-  if(verifyUser(id, urlDatabase)) {
+  if (verifyUser(id, urlDatabase)) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
+  
   } else {
     res.sendStatus(403);
   }
@@ -158,9 +157,10 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const user = users[req.session["user_id"]];
   const id = user.id;
 
-  if(verifyUser(id, urlDatabase)) {
+  if (verifyUser(id, urlDatabase)) {
     urlDatabase[req.params.shortURL].longURL = req.body.newURL;
     res.redirect("/urls");
+  
   } else {
     res.sendStatus(403);
   }
@@ -171,9 +171,10 @@ app.post("/login", (req, res) => {
   
   const validUser = authenticaeUser(email, password, users);
 
-  if(validUser) {
+  if (validUser) {
     req.session["user_id"] = users[validUser].id;
     res.redirect("/urls");
+  
   } else {
     res.sendStatus(403);
   }
@@ -184,6 +185,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
+// Server listening at PORT
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
