@@ -23,6 +23,6 @@ These are three screenshots of the web application in use. The first is the user
 ## Getting Started
 
 - Install all dependencies (using the `npm install` command).
-- Run the development web server using the `node express_server.js` command.
+- Run the development web server using the `npm start` command.
 - Have fun with creating shortened URLs and navigating the web application.
 - Try logging out and then logging back in again to confirm your shortened URLs are still available to you.
