@@ -131,7 +131,11 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
-  if (email.length !== 0 && password.length !== 0 && checkEmail(email, users)) {
+  if (email.length === 0 || password.length === 0) {
+    return res.status(400).send("Email or password can't be blank.");
+  }
+  
+  if(checkEmail(email, users)) {
     const newUserID = generateRandomString();
     const securePassword = bcrypt.hashSync(password, 10);
     
@@ -145,8 +149,7 @@ app.post("/register", (req, res) => {
     res.redirect("/urls");
   
   } else {
-    res.sendStatus(400);
-    console.log(res.statusCode);
+    res.status(400).send("Email already registered. Please register with another email.");
   }
 });
 
@@ -189,6 +192,10 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
+
+  if (email.length === 0 || password.length === 0) {
+    return res.status(403).send("Email or password can't be blank.");
+  }
   
   const validUser = authenticaeUser(email, password, users);
 
@@ -197,7 +204,7 @@ app.post("/login", (req, res) => {
     res.redirect("/urls");
   
   } else {
-    res.sendStatus(403);
+    res.status(403).send("Invalid credentials.");
   }
 });
 
