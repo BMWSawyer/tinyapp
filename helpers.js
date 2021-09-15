@@ -9,18 +9,15 @@ const generateRandomString = function() {
 };
 
 const checkEmail = function(email, users) {
-  let result = true;
   
   for (const user in users) {
-    if (users[user].email !== email || users === {}) {
-      return result;
+    if (users[user].email === email) {
+      return false;
     }
 
-    result = false;
-    return result;
   }
   
-  return result;
+  return true;
 };
 
 const authenticaeUser = function(email, password, users) {
