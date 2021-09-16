@@ -37,14 +37,8 @@ const users = { };
 
 
 // GET routes
-app.get("/", (req, res) => {
-  const user = users[req.session["user_id"]];
-  
-  const templateVars = {
-    user: user
-  };
-  
-  res.render("urls_register", templateVars);
+app.get("/", (req, res) => {  
+  res.redirect("/register");
 });
 
 app.get("/register", (req, res) => {
@@ -105,11 +99,15 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const user = users[req.session["user_id"]];
+  const id = user.id;
   let templateVars;
   
   if (!user) {
     res.redirect("/login");
   
+  } else if (!verifyUser(id, urlDatabase)) {
+    res.sendStatus(403);
+
   } else {
     templateVars = {
       shortURL: req.params.shortURL,
@@ -155,13 +153,24 @@ app.post("/register", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
- 
-  urlDatabase[`${shortURL}`] = {
-    "longURL": req.body.longURL,
-    "userID": req.session["user_id"]
-  };
+  const user = users[req.session["user_id"]];
 
-  res.redirect(`/urls/${shortURL}`);
+  console.log(req.body.longURL.length)
+
+  if (!user) {
+    res.redirect("/login");
+
+  } else if (req.body.longURL.length === 0) {
+    res.status(400).send("You cannot submit an empty URL. Please try again!");
+  
+  } else {
+    urlDatabase[`${shortURL}`] = {
+      "longURL": req.body.longURL,
+      "userID": req.session["user_id"]
+    };
+
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
